@@ -224,3 +224,54 @@ h6 { font-weight: 500; }
 
 .align-right { text-align: right; }
 .align-center { text-align: center; }
+
+/* Form styles adjustments for dark mode */
+[data-theme="dark"] input,
+[data-theme="dark"] select {
+    color: var(--text-color-primary);
+}
+
+[data-theme="dark"] select option {
+    background-color: var(--bg-color-2);
+    color: var(--text-color-primary);
+}
+
+[data-theme="dark"] input::placeholder {
+    color: var(--text-color-secondary);
+}
+
+/* Fix floating label color in dark mode */
+[data-theme="dark"] .floating-label label {
+    color: var(--text-color-secondary);
+    background-color: var(--bg-color-2);
+}
+
+[data-theme="dark"] .floating-label input:focus + label,
+[data-theme="dark"] .floating-label input:not(:placeholder-shown) + label,
+[data-theme="dark"] .floating-label select:focus + label,
+[data-theme="dark"] .floating-label select:valid + label {
+    color: var(--primary-500);
+}
+
+[data-theme="dark"] select:required:invalid {
+    color: var(--text-color-secondary);
+}
+
+/* Ensure text colors are correct in dark mode for buttons */
+[data-theme="dark"] button.secondary {
+    color: var(--text-color-primary);
+}
+
+/* Fix transaction table text colors in dark mode */
+[data-theme="dark"] .transaction-table td {
+    color: var(--text-color-primary);
+}
+
+/* Fix card list item text color in dark mode when not active */
+[data-theme="dark"] .card-list-item-button:not(.active) {
+    color: var(--text-color-primary);
+}
+
+[data-theme="dark"] .card-list-item-button:not(.active) .card-list-item-bank {
+    color: var(--text-color-secondary);
+}

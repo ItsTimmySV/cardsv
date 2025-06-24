@@ -32,12 +32,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-md);
+    padding: 12px 16px; /* Reduced padding */
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--bg-color-3);
     background-color: var(--bg-color-2);
     text-align: left;
     transition: all 0.2s ease;
+    min-height: 64px; /* Reduced minimum height */
 }
 .card-list-item-button:hover {
     border-color: var(--primary-500);
@@ -52,12 +53,16 @@
 .card-list-item-info {
     display: flex;
     flex-direction: column;
+    gap: 2px; /* Reduced gap */
 }
 .card-list-item-alias {
     font-weight: 600;
+    font-size: 0.875rem; /* Reduced font size */
+    line-height: 1.2; /* Add consistent line height */
 }
 .card-list-item-bank {
-    font-size: 0.875rem;
+    font-size: 0.75rem; /* Reduced font size */
+    line-height: 1.2; /* Add consistent line height */
     color: var(--text-color-secondary);
 }
 .card-list-item-button.active .card-list-item-bank {
@@ -65,6 +70,8 @@
 }
 .card-list-item-balance {
     font-weight: 600;
+    font-size: 0.875rem; /* Reduced font size */
+    line-height: 1.2; /* Add consistent line height */
 }
 
 /* Modify icon button styles */
@@ -205,12 +212,32 @@ progress::-webkit-progress-value { background: var(--primary-gradient); }
     display: flex; flex-direction: column; gap: var(--spacing-md);
 }
 .installment-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--spacing-sm); }
-.installment-item h6 { font-size: 1rem; font-weight: 600; }
-.installment-progress-info { display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--text-color-secondary); margin-bottom: var(--spacing-xs); }
-.installment-progress-info span:first-child { font-weight: 500; color: var(--text-color-primary); }
+.installment-item h6 { 
+    font-size: 1rem; 
+    font-weight: 600;
+    color: var(--text-color-primary); /* Add explicit color */
+}
+.installment-progress-info { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 0.875rem; 
+    color: var(--text-color-secondary); 
+    margin-bottom: var(--spacing-xs); 
+}
+.installment-progress-info span:first-child { 
+    font-weight: 500; 
+    color: var(--text-color-primary); 
+}
 .installment-details { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); }
-.installment-details small { font-size: 0.875rem; color: var(--text-color-secondary); }
-.installment-details p { font-size: 0.95rem; font-weight: 500; }
+.installment-details small { 
+    font-size: 0.875rem; 
+    color: var(--text-color-secondary); 
+}
+.installment-details p { 
+    font-size: 0.95rem; 
+    font-weight: 500;
+    color: var(--text-color-primary); /* Add explicit color */
+}
 .installment-actions { display: flex; justify-content: flex-end; }
 .gradient-button.small { padding: 0.5rem 1rem; font-size: 0.875rem; }
 
@@ -243,5 +270,21 @@ progress::-webkit-progress-value { background: var(--primary-gradient); }
 .empty-state p {
     max-width: 35ch;
     margin: 0 auto;
+    color: var(--text-color-secondary);
+}
+
+/* Fix dark mode specific issues */
+[data-theme="dark"] .installment-item {
+    background-color: var(--bg-color-2);
+}
+
+[data-theme="dark"] .installment-item h6,
+[data-theme="dark"] .installment-details p,
+[data-theme="dark"] .installment-progress-info span:first-child {
+    color: var(--text-color-primary);
+}
+
+[data-theme="dark"] .installment-details small,
+[data-theme="dark"] .installment-progress-info {
     color: var(--text-color-secondary);
 }
