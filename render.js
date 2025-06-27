@@ -212,4 +212,33 @@ export const renderSummary = (cards, totalDebtEl, totalAvailableEl, totalLimitEl
     totalDebtEl.textContent = formatCurrency(totalDebt);
     totalAvailableEl.textContent = formatCurrency(totalAvailable);
     totalLimitEl.textContent = formatCurrency(totalLimit);
+
+    // NEW: Calculate and render installment summary
+    let totalInstallmentsDebt = 0;
+    let totalInstallmentsMonthly = 0;
+    let totalActiveInstallments = 0;
+
+    cards.forEach(card => {
+        card.transactions.forEach(tx => {
+            if (tx.type === 'installment_purchase' && tx.paidMonths < tx.months) {
+                totalInstallmentsDebt += tx.remainingAmount;
+                totalInstallmentsMonthly += tx.monthlyPayment;
+                totalActiveInstallments++;
+            }
+        });
+    });
+
+    const installmentsSummarySection = document.getElementById('installments-summary');
+    const totalInstallmentsDebtEl = document.getElementById('total-installments-debt');
+    const totalInstallmentsMonthlyEl = document.getElementById('total-installments-monthly');
+    const totalActiveInstallmentsEl = document.getElementById('total-active-installments');
+
+    if (installmentsSummarySection && totalActiveInstallments > 0) {
+        installmentsSummarySection.classList.remove('hidden');
+        if (totalInstallmentsDebtEl) totalInstallmentsDebtEl.textContent = formatCurrency(totalInstallmentsDebt);
+        if (totalInstallmentsMonthlyEl) totalInstallmentsMonthlyEl.textContent = formatCurrency(totalInstallmentsMonthly);
+        if (totalActiveInstallmentsEl) totalActiveInstallmentsEl.textContent = totalActiveInstallments;
+    } else if (installmentsSummarySection) {
+        installmentsSummarySection.classList.add('hidden');
+    }
 };
