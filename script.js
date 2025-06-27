@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileNav = document.getElementById('mobile-nav');
     const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
     const mobileAddCardBtn = document.getElementById('mobile-add-card-btn');
+    const mobileBackBtn = document.getElementById('mobile-back-btn'); // NEW
 
     // NEW Modal elements
     const transactionDetailModal = document.getElementById('transaction-detail-modal');
@@ -56,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // State
     let cards = getCards();
     let selectedCardId = cards.length > 0 ? cards[0].id : null; // New: Track selected card for detail view
+    let previousMobileView = 'home'; // NEW: Track previous view for back button
 
     // --- RENDER FUNCTION WRAPPER ---
     // This function orchestrates rendering and saving state after any data change.
@@ -79,6 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         renderSummary(cards, totalDebtEl, totalAvailableEl, totalLimitEl);
         saveCards(cards); // Save after any operation that modifies cards
+        // NEW: Update header title after UI is rendered
+        if (window.innerWidth < 992) {
+             updateMobileHeader();
+        }
     };
 
     // --- DATA MANIPULATION FUNCTIONS (passed as callbacks to modules) ---
@@ -98,7 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUI();
         // On mobile, switch back to the card list view after adding/editing a card
         if (window.innerWidth < 992) {
-            switchMobileView('cards');
+            // If adding a new card, go to home to see it. If editing, go back to card list.
+            switchMobileView(type === 'new' ? 'home' : 'cards');
         }
     };
 
@@ -107,14 +114,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedCardId === cardId) {
             selectedCardId = cards.length > 0 ? cards[0].id : null; // Select first card or null if no cards left
         }
-        updateUI();
-        // If the deleted card's modals were open, close them
         if (transactionDetailModal.open && transactionDetailCardIdInput.value === cardId) {
             transactionDetailModal.close();
         }
         if (installmentDetailModal.open && installmentDetailCardIdInput.value === cardId) {
             installmentDetailModal.close();
         }
+        // If we were viewing the deleted card on mobile, go back to the card list
+        if (window.innerWidth < 992 && selectedCardId === null) {
+            switchMobileView('cards');
+        }
+        updateUI(); // Move updateUI to the end to refresh header correctly
     };
 
     const handleSaveTransaction = (cardId, transactionData) => {
@@ -287,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedCardId = cardId;
         updateUI();
         if (window.innerWidth < 992) {
-            switchMobileView('home');
+            switchMobileView('home'); // Go to home view to see details
         }
     };
 
@@ -359,12 +369,27 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Mobile Navigation Logic ---
+    const updateMobileHeader = () => {
+        const view = appLayout.dataset.view;
+        if (view === 'home') {
+            mobileHeaderTitle.textContent = 'Resumen';
+            mobileBackBtn.classList.add('hidden');
+        } else if (view === 'cards') {
+            mobileHeaderTitle.textContent = 'Mis Tarjetas';
+            mobileBackBtn.classList.add('hidden');
+        }
+    };
+    
     const switchMobileView = (view) => {
         appLayout.dataset.view = view;
+
+        mobileNav.classList.remove('hidden'); // Nav is always visible now unless a modal is open
+
         mobileNavBtns.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.view === view);
         });
-        mobileHeaderTitle.textContent = view === 'home' ? 'Resumen' : 'Mis Tarjetas';
+        
+        updateMobileHeader();
         window.scrollTo(0, 0); // Scroll to top on view change
     };
 
@@ -372,6 +397,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => switchMobileView(btn.dataset.view));
     });
     
+    mobileBackBtn.addEventListener('click', () => {
+        // This button is now hidden, but keeping logic in case it's re-introduced
+        if (appLayout.dataset.view === 'cards') {
+            switchMobileView('home');
+        }
+    });
+
     addCardFromEmptyStateBtn.addEventListener('click', () => {
         if (openCardModalCallback) {
             openCardModalCallback(); // Open 'add card' modal

@@ -165,8 +165,10 @@ export const renderAppContent = (cards, selectedCardId, cardsContainer, sidebarC
     
     // Toggle visibility of sections based on state
     const hasCards = cards.length > 0;
+    // On Desktop, these are always visible if there are cards
     document.getElementById('summary').style.display = hasCards ? '' : 'none';
     document.getElementById('card-detail-section').style.display = hasCards ? '' : 'none';
+
     noCardsMessageEl.classList.toggle('hidden', hasCards);
     selectCardMessageEl.classList.toggle('hidden', !hasCards || !!selectedCard);
     cardsContainer.style.display = !!selectedCard ? '' : 'none';
