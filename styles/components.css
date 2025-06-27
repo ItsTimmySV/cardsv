@@ -74,6 +74,16 @@
     line-height: 1.2; /* Add consistent line height */
 }
 
+/* Add margin to card detail section */
+.card-detail-section {
+    margin-top: var(--spacing-xl);
+}
+@media (min-width: 992px) {
+    .card-detail-section {
+        margin-top: 0;
+    }
+}
+
 /* Modify icon button styles */
 .icon-button {
     border-radius: 50%; 

@@ -21,6 +21,17 @@
     justify-content: space-between;
     padding: var(--spacing-md);
     flex-shrink: 0;
+    position: relative; /* For back button positioning */
+    min-height: 70px;
+}
+.mobile-header #mobile-header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+.mobile-header #mobile-theme-switcher {
+    margin-left: auto;
 }
 .panel-header {
     border-bottom: 1px solid var(--bg-color-3);
@@ -77,6 +88,7 @@
     border-radius: 50%;
     transition: all 0.2s ease;
     color: var(--text-color-secondary);
+    flex-shrink: 0; /* Prevent shrinking */
 }
 #theme-switcher:hover, #mobile-theme-switcher:hover {
     transform: rotate(15deg);
@@ -124,6 +136,10 @@
     padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom));
     box-shadow: 0 -2px 10px -2px var(--shadow-color);
     z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+}
+#mobile-nav.hidden {
+    transform: translateY(100%);
 }
 .mobile-nav-btn {
     grid-row: 1;
@@ -173,6 +189,11 @@
 
 #app-layout[data-view="home"] #card-list-panel { display: none; }
 #app-layout[data-view="home"] #main-content-panel { display: block; }
+#app-layout[data-view="home"] #card-detail-section,
+#app-layout[data-view="home"] #select-card-message {
+    /* These are now controlled by render logic, not view logic */
+    display: block; 
+}
 
 #app-layout[data-view="cards"] #card-list-panel { display: flex; }
 #app-layout[data-view="cards"] #main-content-panel { display: none; }
@@ -211,7 +232,7 @@
     }
     .main-content.container {
         max-width: 900px;
-        padding: 0 var(--spacing-xl);
+        padding: var(--spacing-xl);
     }
     
     /* Fix panel header and footer for desktop */
