@@ -10,6 +10,24 @@
 }
 .summary-header {
     margin-bottom: var(--spacing-lg);
+    display: flex; /* Ensure flex layout for alignment */
+    align-items: center; /* Vertically align items */
+    justify-content: space-between; /* Space out title and button */
+}
+.summary-header h3 {
+    margin-right: auto;
+}
+.summary-header .icon-button {
+    margin-left: var(--spacing-sm);
+}
+.summary-header .icon-button svg.chevron-down {
+    transition: transform 0.3s ease;
+}
+.summary-header .icon-button[aria-expanded="false"] svg.chevron-down {
+    transform: rotate(0deg);
+}
+.summary-header .icon-button[aria-expanded="true"] svg.chevron-down {
+    transform: rotate(180deg);
 }
 .summary-grid {
     display: grid;
@@ -209,7 +227,7 @@ progress::-webkit-progress-value { background: var(--primary-gradient); }
 }
 .transaction-table tbody tr { border-bottom: 1px solid var(--bg-color-3); }
 .transaction-table tbody tr:last-child { border-bottom: none; }
-.expense-text { color: var(--text-color-primary); font-weight: 500; }
+.expense-text { color: var(--color-danger); font-weight: 500; }
 .payment-text { color: var(--color-success); font-weight: 500; }
 
 /* Installment Item Styles */

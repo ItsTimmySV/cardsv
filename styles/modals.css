@@ -149,3 +149,48 @@ dialog input, dialog form select {
     overflow-y: auto;
     padding-top: var(--spacing-sm);
 }
+
+/* Theme Selector Modal Styles */
+#theme-selector-container {
+    padding: var(--spacing-lg);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.theme-option-button {
+    border: 2px solid var(--bg-color-3);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--bg-color-2);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.theme-option-button:hover {
+    border-color: var(--primary-500);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px var(--shadow-color);
+}
+
+.theme-preview {
+    display: flex;
+    gap: 4px;
+    height: 40px;
+    width: 100%;
+}
+
+.theme-preview span {
+    flex: 1;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.theme-name {
+    font-weight: 600;
+    color: var(--text-color-primary);
+}

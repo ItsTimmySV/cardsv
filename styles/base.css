@@ -38,6 +38,133 @@
     --border-radius-xl: 16px;
 }
 
+/* --- New Themes --- */
+[data-theme="latte"] {
+    --bg-color-1: #fefbf6;
+    --bg-color-2: #ffffff;
+    --bg-color-3: #f3eade;
+    --text-color-primary: #442c2e;
+    --text-color-secondary: #774936;
+    --text-color-tertiary: #a47551;
+    --shadow-color: rgba(120, 74, 55, 0.08);
+
+    --primary-500: #a47551;
+    --primary-600: #8a5e44;
+    --primary-700: #6272a4;
+    --primary-gradient: linear-gradient(to right, var(--primary-500), var(--primary-600));
+
+    --color-success: #556b2f;
+    --color-success-bg: #f7f9f3;
+    --color-danger: #a52a2a;
+    --color-danger-bg: #fdf5f5;
+    --color-danger-border: #e7d1d1;
+}
+
+[data-theme="rose"] {
+    --bg-color-1: #fdf2f8;
+    --bg-color-2: #ffffff;
+    --bg-color-3: #fce7f3;
+    --text-color-primary: #500724;
+    --text-color-secondary: #831843;
+    --text-color-tertiary: #a35a7a;
+    --shadow-color: rgba(190, 24, 93, 0.08);
+
+    --primary-500: #e11d48;
+    --primary-600: #be123c;
+    --primary-700: #a35a7a;
+    --primary-gradient: linear-gradient(to right, var(--primary-500), var(--primary-600));
+
+    --color-success: #16a34a;
+    --color-success-bg: #f0fdf4;
+    --color-danger: #dc2626;
+    --color-danger-bg: #fef2f2;
+    --color-danger-border: #fecaca;
+}
+
+[data-theme="dracula"] {
+    --bg-color-1: #282a36; 
+    --bg-color-2: #44475a; 
+    --bg-color-3: #6272a420; /* Lower opacity for subtle border */
+    --text-color-primary: #f8f8f2; 
+    --text-color-secondary: #bd93f9; 
+    --text-color-tertiary: #6272a4;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+
+    --primary-500: #ff79c6; 
+    --primary-600: #bd93f9;
+    --primary-700: #6272a4;
+    --primary-gradient: linear-gradient(to right, var(--primary-500), var(--primary-600));
+
+    --color-success: #50fa7b;
+    --color-success-bg: transparent;
+    --color-danger: #ff5555;
+    --color-danger-bg: transparent;
+    --color-danger-border: #ff555530;
+}
+
+[data-theme="midnight"] {
+    --bg-color-1: #0d1117; 
+    --bg-color-2: #161b22; 
+    --bg-color-3: #21262d; 
+    --text-color-primary: #c9d1d9; 
+    --text-color-secondary: #8b949e; 
+    --text-color-tertiary: #484f58;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    
+    --primary-500: #58a6ff; 
+    --primary-600: #388bfd;
+    --primary-700: #1f6feb;
+    --primary-gradient: linear-gradient(to right, var(--primary-500), var(--primary-600));
+
+    --color-success: #56d364;
+    --color-success-bg: transparent;
+    --color-danger: #f85149;
+    --color-danger-bg: transparent;
+    --color-danger-border: #3e2329;
+}
+
+[data-theme="sunset"] {
+    --bg-color-1: #2c2138; 
+    --bg-color-2: #423254; 
+    --bg-color-3: #5a4570; 
+    --text-color-primary: #f5e8ff; 
+    --text-color-secondary: #c9a7e6; 
+    --text-color-tertiary: #a387be;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+
+    --primary-500: #ff9a8b; 
+    --primary-600: #ff6a88; 
+    --primary-700: #ff5e62;
+    --primary-gradient: linear-gradient(to right, #ff9a8b, #ff6a88);
+
+    --color-success: #78e8c8; 
+    --color-success-bg: transparent;
+    --color-danger: #ff8e8e; 
+    --color-danger-bg: transparent;
+    --color-danger-border: #724f60;
+}
+
+[data-theme="mint"] {
+    --bg-color-1: #f0fdfa; 
+    --bg-color-2: #ffffff;
+    --bg-color-3: #ccfbf1; 
+    --text-color-primary: #0f766e; 
+    --text-color-secondary: #115e59;
+    --text-color-tertiary: #14b8a6; 
+    --shadow-color: rgba(13, 148, 136, 0.08);
+
+    --primary-500: #0d9488; 
+    --primary-600: #0f766e; 
+    --primary-700: #115e59; 
+    --primary-gradient: linear-gradient(to right, var(--primary-500), var(--primary-600));
+
+    --color-success: #16a34a;
+    --color-success-bg: #f0fdf4;
+    --color-danger: #dc2626;
+    --color-danger-bg: #fef2f2;
+    --color-danger-border: #fecaca;
+}
+
 [data-theme="dark"] {
     /* Dark Theme */
     --bg-color-1: #111827; /* gray-900 */
@@ -262,16 +389,40 @@ h6 { font-weight: 500; }
     color: var(--text-color-primary);
 }
 
-/* Fix transaction table text colors in dark mode */
-[data-theme="dark"] .transaction-table td {
+/* Set default transaction text color to primary (e.g., white) for readability in dark themes */
+[data-theme="dark"] .transaction-table td,
+[data-theme="dracula"] .transaction-table td,
+[data-theme="midnight"] .transaction-table td,
+[data-theme="sunset"] .transaction-table td {
     color: var(--text-color-primary);
+}
+
+/* Specifically set expense and payment colors to override the general rule above */
+[data-theme="dark"] .transaction-table .expense-text,
+[data-theme="dracula"] .transaction-table .expense-text,
+[data-theme="midnight"] .transaction-table .expense-text,
+[data-theme="sunset"] .transaction-table .expense-text {
+    color: var(--color-danger);
+}
+
+[data-theme="dark"] .transaction-table .payment-text,
+[data-theme="dracula"] .transaction-table .payment-text,
+[data-theme="midnight"] .transaction-table .payment-text,
+[data-theme="sunset"] .transaction-table .payment-text {
+    color: var(--color-success);
 }
 
 /* Fix card list item text color in dark mode when not active */
-[data-theme="dark"] .card-list-item-button:not(.active) {
+[data-theme="dark"] .card-list-item-button:not(.active),
+[data-theme="dracula"] .card-list-item-button:not(.active),
+[data-theme="midnight"] .card-list-item-button:not(.active),
+[data-theme="sunset"] .card-list-item-button:not(.active) {
     color: var(--text-color-primary);
 }
 
-[data-theme="dark"] .card-list-item-button:not(.active) .card-list-item-bank {
+[data-theme="dark"] .card-list-item-button:not(.active) .card-list-item-bank,
+[data-theme="dracula"] .card-list-item-button:not(.active) .card-list-item-bank,
+[data-theme="midnight"] .card-list-item-button:not(.active) .card-list-item-bank,
+[data-theme="sunset"] .card-list-item-button:not(.active) .card-list-item-bank {
     color: var(--text-color-secondary);
 }
