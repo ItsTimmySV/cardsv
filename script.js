@@ -1,7 +1,7 @@
 import { getCards, saveCards, formatCurrency, setupModalClose } from './utils.js';
 import { renderAppContent, renderSummary, createTransactionRowHtml, createInstallmentItemHtml, setupTransactionActionListeners, setupInstallmentActionListeners, setupInstallmentDeleteActionListeners } from './render.js';
 import { setupCardModal, setupTransactionModal } from './modals.js';
-import { setupThemeSwitcher, setupDataImportExport } from './theme-import-export.js';
+import { setupThemeSelector, setupDataImportExport } from './theme-import-export.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalAvailableEl = document.getElementById('total-available');
     const totalLimitEl = document.getElementById('total-limit');
     const addCardBtnSidebar = document.getElementById('add-card-btn-sidebar'); // New: Add card button in sidebar
+    const editCardBtn = document.getElementById('edit-card-btn'); // NEW: Edit button in main view
     
     // NEW Mobile Nav Elements
     const mobileNav = document.getElementById('mobile-nav');
@@ -48,6 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const installmentDetailCardIdInput = document.getElementById('installment-detail-card-id');
     const noInstallmentsMessageModal = document.getElementById('no-installments-message-modal');
 
+    // NEW: Theme modal elements
+    const themeModal = document.getElementById('theme-modal');
+    const themeSelectorContainer = document.getElementById('theme-selector-container');
+
+    // NEW: Get all toggle buttons and their corresponding grids
+    const summaryToggles = [
+        { btn: document.getElementById('toggle-general-summary'), grid: document.getElementById('general-summary-grid') },
+        { btn: document.getElementById('toggle-payments-summary'), grid: document.getElementById('payments-summary-grid') },
+        { btn: document.getElementById('toggle-installments-summary'), grid: document.getElementById('installments-summary-grid') }
+    ];
+
     // Layout Elements
     const appLayout = document.getElementById('app-layout');
     const mainContentPanel = document.getElementById('main-content-panel');
@@ -62,6 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- RENDER FUNCTION WRAPPER ---
     // This function orchestrates rendering and saving state after any data change.
     const updateUI = () => {
+        const hasCards = cards.length > 0;
+        const selectedCard = cards.find(c => c.id === selectedCardId);
+
         renderAppContent(
             cards,
             selectedCardId,
@@ -81,7 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         renderSummary(cards, totalDebtEl, totalAvailableEl, totalLimitEl);
         saveCards(cards); // Save after any operation that modifies cards
-        // NEW: Update header title after UI is rendered
+        
+        // NEW: Update header title and edit button visibility
+        if (editCardBtn) {
+            editCardBtn.style.display = selectedCard ? 'inline-flex' : 'none';
+        }
         if (window.innerWidth < 992) {
              updateMobileHeader();
         }
@@ -105,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // On mobile, switch back to the card list view after adding/editing a card
         if (window.innerWidth < 992) {
             // If adding a new card, go to home to see it. If editing, go back to card list.
-            switchMobileView(type === 'new' ? 'home' : 'cards');
+            switchMobileView('home');
         }
     };
 
@@ -123,6 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // If we were viewing the deleted card on mobile, go back to the card list
         if (window.innerWidth < 992 && selectedCardId === null) {
             switchMobileView('cards');
+        } else if (window.innerWidth < 992) {
+            // If on mobile and other cards exist, switch to home view to see the new selected card
+            switchMobileView('home');
         }
         updateUI(); // Move updateUI to the end to refresh header correctly
     };
@@ -416,14 +438,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // NEW: Generic setup for all summary toggles
+    summaryToggles.forEach(toggle => {
+        if (toggle.btn && toggle.grid) {
+            toggle.btn.addEventListener('click', () => {
+                const isExpanded = toggle.btn.getAttribute('aria-expanded') === 'true';
+                toggle.btn.setAttribute('aria-expanded', !isExpanded);
+                toggle.grid.classList.toggle('hidden');
+            });
+        }
+    });
+
     // NEW: Setup close listeners for the new detail modals
     setupModalClose(transactionDetailModal);
     setupModalClose(installmentDetailModal);
+    setupModalClose(themeModal);
 
     // Event listeners for new UI elements
     addCardBtnSidebar.addEventListener('click', () => {
         if (openCardModalCallback) {
             openCardModalCallback(); // Directly call the stored callback to open the modal
+        }
+    });
+
+    editCardBtn.addEventListener('click', () => {
+        if (openCardModalCallback) {
+            const selectedCard = cards.find(c => c.id === selectedCardId);
+            if (selectedCard) {
+                openCardModalCallback(selectedCard);
+            }
         }
     });
 
@@ -443,8 +486,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setupTransactionModal(transactionModal, transactionForm, installmentsGroup, typeSelect, handleSaveTransaction, (callback) => {
         addTransactionModalCallback = callback; // Store the callback from modals.js for later use by render.js
     });
-    setupThemeSwitcher(themeSwitcher);
-    setupThemeSwitcher(mobileThemeSwitcher);
+    
+    // NEW: Setup theme selector modal
+    setupThemeSelector(themeModal, themeSelectorContainer, [themeSwitcher, mobileThemeSwitcher]);
+    
     setupDataImportExport(exportBtn, importBtn, importFile, () => cards, handleImportSuccess);
 
     // Initial Render

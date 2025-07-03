@@ -1,46 +1,71 @@
 // This module handles theme switching and data import/export functionality.
 
-export const setupThemeSwitcher = (themeSwitcher) => {
-    // NEW: Icons are now defined as SVGs within the button's innerHTML
-    const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
-    const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+const themes = [
+    // Light Themes
+    { name: 'light', displayName: 'Claro', colors: ['#f3f4f6', '#4f46e5', '#16a34a'] },
+    { name: 'mint', displayName: 'Menta', colors: ['#f0fdfa', '#0d9488', '#16a34a'] },
+    { name: 'latte', displayName: 'Latte', colors: ['#fff', '#a47551', '#556b2f'] },
+    { name: 'rose', displayName: 'Rosé', colors: ['#fff', '#e11d48', '#16a34a'] },
+    // Dark Themes
+    { name: 'dark', displayName: 'Oscuro', colors: ['#1f2937', '#4f46e5', '#4ade80'] },
+    { name: 'midnight', displayName: 'Medianoche', colors: ['#161b22', '#58a6ff', '#56d364'] },
+    { name: 'sunset', displayName: 'Atardecer', colors: ['#423254', '#ff9a8b', '#78e8c8'] },
+    { name: 'dracula', displayName: 'Drácula', colors: ['#44475a', '#ff79c6', '#50fa7b'] }
+];
 
-    const updateTheme = () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        if (themeSwitcher) {
-             themeSwitcher.innerHTML = currentTheme === 'dark' ? sunIcon : moonIcon;
-        }
-        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-        if (themeColorMeta) {
-            themeColorMeta.setAttribute('content', currentTheme === 'dark' ? '#111827' : '#ffffff');
-        }
-    };
-    
-    if (themeSwitcher) {
-        themeSwitcher.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            // We need to update all theme switchers on the page
-            document.dispatchEvent(new CustomEvent('themechange'));
+const applyTheme = (themeName) => {
+    const selectedTheme = themes.find(t => t.name === themeName) || themes[0];
+    document.documentElement.setAttribute('data-theme', selectedTheme.name);
+    localStorage.setItem('theme', selectedTheme.name);
+    document.dispatchEvent(new CustomEvent('themechange'));
+};
+
+export const setupThemeSelector = (themeModal, themeContainer, themeSwitcherButtons) => {
+    // 1. Populate the theme modal with theme options
+    themeContainer.innerHTML = '';
+    themes.forEach(theme => {
+        const themeButton = document.createElement('button');
+        themeButton.className = 'theme-option-button';
+        themeButton.dataset.themeName = theme.name;
+        themeButton.innerHTML = `
+            <div class="theme-preview">
+                <span style="background-color: ${theme.colors[0]}"></span>
+                <span style="background-color: ${theme.colors[1]}"></span>
+                <span style="background-color: ${theme.colors[2]}"></span>
+            </div>
+            <span class="theme-name">${theme.displayName}</span>
+        `;
+        themeButton.addEventListener('click', () => {
+            applyTheme(theme.name);
+            themeModal.close();
         });
-    }
+        themeContainer.appendChild(themeButton);
+    });
 
-    // Listen for a custom event to sync all theme switchers
-    document.addEventListener('themechange', updateTheme);
-    
-    // Set initial icon
-    updateTheme();
+    // 2. Add event listeners to all buttons that should open the theme modal
+    themeSwitcherButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            themeModal.showModal();
+        });
+    });
+
+    // 3. Set the initial theme from localStorage or default
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
 };
 
 export const setupDataImportExport = (exportBtn, importBtn, importFile, getCardsRef, onImportSuccess) => {
     exportBtn.addEventListener('click', () => {
         const cards = getCardsRef();
-        if (cards.length === 0) {
-            alert('No hay datos para exportar.');
-            return;
-        }
-        const dataStr = JSON.stringify(cards, null, 2);
+        const currentTheme = localStorage.getItem('theme') || 'light';
+
+        // We export even if there are no cards, to save the theme.
+        const exportData = {
+            theme: currentTheme,
+            cards: cards
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
         const dataBlob = new Blob([dataStr], {type: 'application/json'});
         const url = URL.createObjectURL(dataBlob);
         const link = document.createElement('a');
@@ -61,12 +86,23 @@ export const setupDataImportExport = (exportBtn, importBtn, importFile, getCards
         reader.onload = (event) => {
             try {
                 const importedData = JSON.parse(event.target.result);
-                if (Array.isArray(importedData)) {
-                     if(confirm('Esto reemplazará todos tus datos actuales. ¿Estás seguro?')){
-                        onImportSuccess(importedData); // Callback to update and re-render main state
+                
+                // Check for new format { theme: '...', cards: [...] }
+                if (importedData && importedData.cards && Array.isArray(importedData.cards) && importedData.theme) {
+                     if(confirm('Esto reemplazará todos tus datos actuales, incluyendo el tema. ¿Estás seguro?')){
+                        applyTheme(importedData.theme);
+                        onImportSuccess(importedData.cards); // Callback to update and re-render main state
                         alert('¡Datos importados con éxito!');
                     }
-                } else {
+                } 
+                // Check for old format (just an array of cards) for backward compatibility
+                else if (Array.isArray(importedData)) {
+                    if(confirm('Este es un archivo de respaldo antiguo. Esto reemplazará todos tus datos de tarjetas actuales, pero no el tema. ¿Estás seguro?')){
+                        onImportSuccess(importedData);
+                        alert('¡Datos de tarjetas importados con éxito!');
+                    }
+                }
+                else {
                     throw new Error('Formato de archivo no válido.');
                 }
             } catch (error) {

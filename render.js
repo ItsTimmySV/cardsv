@@ -207,20 +207,21 @@ export const renderAppContent = (cards, selectedCardId, cardsContainer, sidebarC
 
 // Render summary totals
 export const renderSummary = (cards, totalDebtEl, totalAvailableEl, totalLimitEl) => {
-    const totalLimit = cards.reduce((sum, card) => sum + card.limit, 0);
-    const totalDebt = cards.reduce((sum, card) => sum + calculateCardDetails(card).currentBalance, 0);
-    const totalAvailable = totalLimit - totalDebt;
-
-    totalDebtEl.textContent = formatCurrency(totalDebt);
-    totalAvailableEl.textContent = formatCurrency(totalAvailable);
-    totalLimitEl.textContent = formatCurrency(totalLimit);
-
-    // NEW: Calculate and render installment summary
+    let totalLimit = 0;
+    let totalDebt = 0;
+    let totalPaymentForPeriod = 0;
+    let totalNextPayment = 0;
     let totalInstallmentsDebt = 0;
     let totalInstallmentsMonthly = 0;
     let totalActiveInstallments = 0;
 
     cards.forEach(card => {
+        const details = calculateCardDetails(card);
+        totalLimit += card.limit;
+        totalDebt += details.currentBalance;
+        totalPaymentForPeriod += details.paymentForPeriod;
+        totalNextPayment += details.nextPayment;
+
         card.transactions.forEach(tx => {
             if (tx.type === 'installment_purchase' && tx.paidMonths < tx.months) {
                 totalInstallmentsDebt += tx.remainingAmount;
@@ -230,12 +231,27 @@ export const renderSummary = (cards, totalDebtEl, totalAvailableEl, totalLimitEl
         });
     });
 
+    const totalAvailable = totalLimit - totalDebt;
+
+    totalDebtEl.textContent = formatCurrency(totalDebt);
+    totalAvailableEl.textContent = formatCurrency(totalAvailable);
+    totalLimitEl.textContent = formatCurrency(totalLimit);
+
+    // Render new summary items for period payment and next payment
+    const totalPaymentForPeriodEl = document.getElementById('total-payment-for-period');
+    const totalNextPaymentEl = document.getElementById('total-next-payment');
+    if (totalPaymentForPeriodEl) totalPaymentForPeriodEl.textContent = formatCurrency(totalPaymentForPeriod);
+    if (totalNextPaymentEl) totalNextPaymentEl.textContent = formatCurrency(totalNextPayment);
+
+    // Calculate and render installment summary
     const installmentsSummarySection = document.getElementById('installments-summary');
     const totalInstallmentsDebtEl = document.getElementById('total-installments-debt');
     const totalInstallmentsMonthlyEl = document.getElementById('total-installments-monthly');
     const totalActiveInstallmentsEl = document.getElementById('total-active-installments');
 
     if (installmentsSummarySection && totalActiveInstallments > 0) {
+        // The section is only visible if there are active installments.
+        // The content grid visibility is handled by a separate toggle button in script.js
         installmentsSummarySection.classList.remove('hidden');
         if (totalInstallmentsDebtEl) totalInstallmentsDebtEl.textContent = formatCurrency(totalInstallmentsDebt);
         if (totalInstallmentsMonthlyEl) totalInstallmentsMonthlyEl.textContent = formatCurrency(totalInstallmentsMonthly);

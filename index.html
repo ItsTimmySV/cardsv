@@ -50,8 +50,11 @@
                 <section id="summary" class="summary-section">
                     <div class="summary-header">
                         <h3>Balance General</h3>
+                        <button id="toggle-general-summary" class="icon-button small" aria-label="Mostrar/Ocultar balance general" aria-expanded="true" aria-controls="general-summary-grid">
+                            <svg class="chevron-down" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
                     </div>
-                    <div class="summary-grid">
+                    <div id="general-summary-grid" class="summary-grid">
                         <div class="summary-item">
                             <h6 class="secondary-text">Deuda Total</h6>
                             <h4 id="total-debt">$0.00</h4>
@@ -67,12 +70,35 @@
                     </div>
                 </section>
 
+                <!-- Payments Summary -->
+                <section id="payments-summary" class="summary-section">
+                    <div class="summary-header">
+                        <h3>Resumen de Pagos</h3>
+                        <button id="toggle-payments-summary" class="icon-button small" aria-label="Mostrar/Ocultar resumen de pagos" aria-expanded="true" aria-controls="payments-summary-grid">
+                            <svg class="chevron-down" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                    </div>
+                    <div id="payments-summary-grid" class="summary-grid">
+                        <div class="summary-item">
+                            <h6 class="secondary-text">Pago del Periodo</h6>
+                            <h4 id="total-payment-for-period">$0.00</h4>
+                        </div>
+                        <div class="summary-item">
+                            <h6 class="secondary-text">Próximo Pago (Est.)</h6>
+                            <h4 id="total-next-payment">$0.00</h4>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Installments Summary -->
                 <section id="installments-summary" class="summary-section hidden">
                     <div class="summary-header">
                         <h3>Resumen de Compras a Plazo</h3>
+                        <button id="toggle-installments-summary" class="icon-button small" aria-label="Mostrar/Ocultar resumen de compras a plazo" aria-expanded="false" aria-controls="installments-summary-grid">
+                            <svg class="chevron-down" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
                     </div>
-                    <div class="summary-grid">
+                    <div id="installments-summary-grid" class="summary-grid hidden">
                         <div class="summary-item">
                             <h6 class="secondary-text">Deuda Restante</h6>
                             <h4 id="total-installments-debt">$0.00</h4>
@@ -92,6 +118,9 @@
                 <section id="card-detail-section" class="card-detail-section">
                     <div class="section-header">
                         <h3 id="card-detail-title">Detalles de la Tarjeta</h3>
+                        <button id="edit-card-btn" class="icon-button" aria-label="Editar Tarjeta">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
                     </div>
                     <div id="cards-container"></div>
                 </section>
@@ -274,6 +303,21 @@
                     <!-- Installment items will be injected here -->
                 </div>
                 <p id="no-installments-message-modal" class="empty-state hidden">No hay compras a plazo registradas para esta tarjeta.</p>
+            </div>
+            <footer class="modal-footer">
+                <button type="button" class="secondary" data-close-modal>Cerrar</button>
+            </footer>
+        </article>
+    </dialog>
+
+    <dialog id="theme-modal">
+        <article>
+            <header>
+                <h3>Elige un Tema</h3>
+                <button aria-label="Close" class="close"></button>
+            </header>
+            <div id="theme-selector-container">
+                <!-- Theme options will be injected here by script.js -->
             </div>
             <footer class="modal-footer">
                 <button type="button" class="secondary" data-close-modal>Cerrar</button>

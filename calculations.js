@@ -49,55 +49,68 @@ export const calculateCardDetails = (card) => {
     }
 
     // --- Calculate 'Pago para no generar intereses' (Previous Statement Balance) ---
-    // Sum all debits (expenses, monthly installment amounts) and subtract credits (payments)
-    // that occurred within the period (previousStatementCutoff, currentStatementCutoff].
-    let paymentForPeriodAmount = 0;
+    // This is a two-step process:
+    // 1. Calculate the balance of the statement that closed at `currentStatementCutoff`.
+    // 2. Subtract any payments made since that statement closed.
+
+    // Step 1: Calculate the initial statement balance.
+    let initialStatementBalance = 0;
     card.transactions.forEach(tx => {
         const txDate = new Date(tx.date + 'T00:00:00');
+        // Only consider transactions within the previous statement period.
         if (txDate > prevStatementCutoff && txDate <= currentStatementCutoff) {
             if (tx.type === 'expense') {
-                paymentForPeriodAmount += tx.amount;
-            } else if (tx.type === 'installment_purchase') {
-                // For 'Pago para no generar intereses', we look at actual payments made in the period
-                // This will be handled by the related 'payment' transactions.
-            } else if (tx.type === 'payment') {
-                paymentForPeriodAmount -= tx.amount;
+                initialStatementBalance += tx.amount;
+            } else if (tx.type === 'payment' && !tx.relatedInstallmentId) {
+                // Subtract general payments made within the period
+                initialStatementBalance -= tx.amount;
             }
         }
     });
-     // Add installment monthly payments due in the *previous* cycle
-    card.transactions.filter(tx => tx.type === 'installment_purchase' && tx.paidMonths < tx.months).forEach(inst => {
+
+    // Add installment monthly payments that were due in that statement.
+    card.transactions.filter(tx => tx.type === 'installment_purchase').forEach(inst => {
         const purchaseDate = new Date(inst.date + 'T00:00:00');
-        // Only add the monthly payment if the purchase was active during the previous cycle
+        // Check if the purchase was active during the previous cycle
         if (currentStatementCutoff > purchaseDate) {
-             // And crucially, only if a payment for it was *not* already made and accounted for in the loop above.
-             // We check if a 'payment' transaction related to this installment exists within the statement period.
+            // Check if a payment for this installment was made *within* the previous statement period
              const wasPaidInPeriod = card.transactions.some(p => 
                 p.relatedInstallmentId === inst.id &&
                 new Date(p.date + 'T00:00:00') > prevStatementCutoff &&
                 new Date(p.date + 'T00:00:00') <= currentStatementCutoff
              );
-             // If it wasn't paid via the installment system, it's considered part of the "new" balance for that statement.
              if (!wasPaidInPeriod) {
-                paymentForPeriodAmount += inst.monthlyPayment;
+                initialStatementBalance += inst.monthlyPayment;
              }
         }
     });
 
+    // Step 2: Subtract all payments made since the last statement closed.
+    let paymentsSinceStatementClosed = 0;
+    card.transactions.forEach(tx => {
+        const txDate = new Date(tx.date + 'T00:00:00');
+        if (tx.type === 'payment' && txDate > currentStatementCutoff) {
+            paymentsSinceStatementClosed += tx.amount;
+        }
+    });
+    
+    // The final amount is the initial balance minus payments made against it.
+    const paymentForPeriodAmount = initialStatementBalance - paymentsSinceStatementClosed;
+
+
     // --- Calculate 'Próximo Pago (Estimado)' (Current Statement Estimate) ---
-    // Sum all debits and subtract credits that occurred within the period (currentStatementCutoff, nextCutoff].
+    // Sum all debits that occurred within the period (currentStatementCutoff, nextCutoff].
     // This value represents the total *new charges* that will appear on the next statement.
     let nextPaymentAmount = 0;
-    // 1. Sum regular expenses and payments within the current cycle
+    // 1. Sum regular expenses within the current cycle
     card.transactions.forEach(tx => {
         const txDate = new Date(tx.date + 'T00:00:00');
         if (txDate > currentStatementCutoff && txDate <= nextCutoff) {
              if (tx.type === 'expense') {
                 nextPaymentAmount += tx.amount;
-            } else if (tx.type === 'payment' && !tx.relatedInstallmentId) { 
-                // Subtract general payments, but not installment-specific ones
-                nextPaymentAmount -= tx.amount;
             }
+            // Payments made in the current cycle no longer reduce the 'nextPaymentAmount'.
+            // They are accounted for when calculating the 'paymentForPeriod' of the *next* cycle.
         }
     });
 
