@@ -145,14 +145,12 @@ dialog input, dialog form select {
 /* Styles for the transaction and installment detail modals */
 .modal-content-scroll {
     flex-grow: 1;
-    padding: 0 2rem 2rem;
+    padding: var(--spacing-lg); /* Unify padding */
     overflow-y: auto;
-    padding-top: var(--spacing-sm);
 }
 
 /* Theme Selector Modal Styles */
 #theme-selector-container {
-    padding: var(--spacing-lg);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: var(--spacing-md);
